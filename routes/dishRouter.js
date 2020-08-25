@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const Dishes = require('../models/dishes');
+const authenticate = require('../authenticate');
 
 const dishRouter = express.Router();
 dishRouter.use(bodyParser.json());
@@ -17,7 +18,7 @@ dishRouter.route('/')
             }, err => next(err))
             .catch(err => next(err))
     })
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         Dishes.create(req.body)
             .then((dish) => {
                 console.log('Dish created', dish);
@@ -27,11 +28,11 @@ dishRouter.route('/')
             }, err => next(err))
             .catch(err => next(err))
     })
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser, (req, res, next) => {
         res.statuscode = 403;
         res.end('put operations not supported on /dishes');
     })
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         console.log('Removing all dishes');
         Dishes.deleteMany({})
             .then((resp) => {
@@ -53,7 +54,7 @@ dishRouter.route('/:id')
             }, err => next(err))
             .catch(err => next(err))
     })
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser, (req, res, next) => {
         Dishes.findByIdAndUpdate(req.params.id, {
             $set: req.body
         }, { new: true })
@@ -64,7 +65,7 @@ dishRouter.route('/:id')
             }, err => next(err))
             .catch(err => next(err))
     })
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         Dishes.findByIdAndDelete(req.params.id)
             .then((dish) => {
                 res.StatusCode = 200;
@@ -91,7 +92,7 @@ dishRouter.route('/:id/comments')
             }, err => next(err))
             .catch(err => next(err))
     })
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         Dishes.findById(req.params.id)
             .then((dish) => {
                 if (dish != null) {
@@ -110,11 +111,11 @@ dishRouter.route('/:id/comments')
                 }
             })
     })
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser, (req, res, next) => {
         res.statuscode = 403;
         res.end('put operations not supported on /dishes');
     })
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         Dishes.findById(req.params.id)
             .then((dish) => {
                 if (dish != null) {
